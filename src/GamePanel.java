@@ -5,24 +5,35 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.MouseInfo;
+import java.awt.Point;
 
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
-public class GamePanel extends JPanel implements ActionListener, KeyListener {
+public class GamePanel extends JPanel implements ActionListener, KeyListener, MouseListener {
 
 	final int MENU_STATE = 0;
 	final int GAME_STATE = 1;
+	final int SHOP_STATE = 99999;
 	final int END_STATE = 2;
 	int currentState = MENU_STATE;
 	Font titleFont;
+	Font subtitleFont;
 	Timer timer;
-	Player p = new Player(250, 250, 40, 40);
+	Player p = new Player(100, 250, 30, 30);
 	ObjectManager objectManager = new ObjectManager(p);
+	int bulletSize = 2;
+	int playerSize = 30;
+	int money = 0;
 
 	GamePanel() {
 		titleFont = new Font("Arial", Font.BOLD, 36);
+		subtitleFont = new Font("Arial", Font.PLAIN, 20);
 		timer = new Timer((1000 / 60), this);
+
 	}
 
 	void startGame() {
@@ -34,8 +45,20 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 	}
 
 	void updateGameState() {
+		Point point = MouseInfo.getPointerInfo().getLocation();
 		p.update();
+		p.mouseY = point.y - 65;
 		objectManager.update();
+
+		System.out.println(point.x + ", " + point.y);
+	}
+
+	void updateShopState() {
+		Point point = MouseInfo.getPointerInfo().getLocation();
+		p.mouseY = point.y;
+		p.mouseX = point.x;
+
+		System.out.println(point.x + ", " + point.y);
 	}
 
 	void updateEndState() {
@@ -58,7 +81,17 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 		for (Bullet bullet : objectManager.bullets) {
 			bullet.draw(g);
 		}
+	}
 
+	void drawShopState(Graphics g) {
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, 600, 600);
+		g.setFont(titleFont);
+		g.setColor(Color.black);
+		g.drawString("UPGRADES", 190, 100);
+		g.setFont(subtitleFont);
+		g.drawRect(50, 150, 500, 50);
+		g.drawString("Upgrade damage", 60, 170);
 	}
 
 	void drawEndState(Graphics g) {
@@ -77,6 +110,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
 		if (currentState == GAME_STATE) {
 			drawGameState(g);
+		}
+
+		if (currentState == SHOP_STATE) {
+			drawShopState(g);
 		}
 
 		if (currentState == END_STATE) {
@@ -98,6 +135,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 			updateGameState();
 		}
 
+		if (currentState == SHOP_STATE) {
+			updateShopState();
+		}
+
 		if (currentState == END_STATE) {
 			updateEndState();
 		}
@@ -115,7 +156,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (currentState == END_STATE) {
-				p = new Player(250, 250, 50, 50);
+				p = new Player(100, 250, 30, 30);
+				money = 0;
+				bulletSize = 2;
+				playerSize = 30;
 			}
 			currentState++;
 			if (currentState > END_STATE) {
@@ -124,90 +168,58 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
 		}
 
-		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			if (currentState == GAME_STATE) {
+				currentState = SHOP_STATE;
+			} else {
 
-			if (p.aimLeft) {
-				objectManager.addBullet(new Bullet(p.x, p.y + 18, 5, 5));
-
-			}
-
-			if (p.aimRight) {
-				objectManager.addBullet(new Bullet(p.x, p.y + 18, 5, 5));
-			}
-
-			if (p.aimUp) {
-				objectManager.addBullet(new Bullet(p.x + 18, p.y, 5, 5));
-			}
-
-			if (p.aimDown) {
-				objectManager.addBullet(new Bullet(p.x + 18, p.y, 5, 5));
+				if (currentState == SHOP_STATE) {
+					currentState = GAME_STATE;
+				}
 			}
 		}
-
-		if (e.getKeyCode() == KeyEvent.VK_A) {
-			p.moveLeft = true;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_D) {
-			p.moveRight = true;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_W) {
-			p.moveUp = true;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_S) {
-			p.moveDown = true;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_A) {
-			p.aimLeft = true;
-			p.aimRight = false;
-			p.aimUp = false;
-			p.aimDown = false;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_D) {
-			p.aimLeft = false;
-			p.aimRight = true;
-			p.aimUp = false;
-			p.aimDown = false;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_W) {
-			p.aimLeft = false;
-			p.aimRight = false;
-			p.aimUp = true;
-			p.aimDown = false;
-		}
-
-		if (e.getKeyCode() == KeyEvent.VK_S) {
-			p.aimLeft = false;
-			p.aimRight = false;
-			p.aimUp = false;
-			p.aimDown = true;
-		}
-
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getKeyCode() == KeyEvent.VK_A) {
-			p.moveLeft = false;
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if (currentState == GAME_STATE) {
+			objectManager.addBullet(new Bullet(p.x, p.y + 19, bulletSize, bulletSize));
 		}
 
-		if (e.getKeyCode() == KeyEvent.VK_D) {
-			p.moveRight = false;
+		if (currentState == SHOP_STATE) {
+			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 250 && p.mouseY > 200) {
+				System.out.println("1231321321321231321232132312323123231");
+			}
 		}
+	}
 
-		if (e.getKeyCode() == KeyEvent.VK_W) {
-			p.moveUp = false;
-		}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+	}
 
-		if (e.getKeyCode() == KeyEvent.VK_S) {
-			p.moveDown = false;
-		}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 
 }

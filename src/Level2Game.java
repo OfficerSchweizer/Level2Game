@@ -16,6 +16,7 @@ public class Level2Game {
 	void setup() {
 		frame.add(gamePanel);
 		frame.addKeyListener(gamePanel);
+		frame.addMouseListener(gamePanel);
 		frame.getContentPane().setPreferredSize(new Dimension(600, 600));
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);

@@ -12,7 +12,7 @@ public class Bullet extends GameObject {
 
 	void update() {
 		// collisionBox.setBounds(x, y, width, height);
-		x -= speed;
+		x += speed;
 
 	}
 
