@@ -7,6 +7,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Random;
 import java.awt.MouseInfo;
 import java.awt.Point;
 
@@ -25,9 +26,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 	Timer timer;
 	Player p = new Player(100, 250, 30, 30);
 	ObjectManager objectManager = new ObjectManager(p);
-	int bulletSize = 2;
-	int playerSize = 30;
-	int money = 0;
 
 	GamePanel() {
 		titleFont = new Font("Arial", Font.BOLD, 36);
@@ -46,19 +44,26 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
 	void updateGameState() {
 		Point point = MouseInfo.getPointerInfo().getLocation();
-		p.update();
+		p.update(objectManager.speed, objectManager.playerSize);
 		p.mouseY = point.y - 65;
 		objectManager.update();
 
-		System.out.println(point.x + ", " + point.y);
+		// System.out.println(point.x + ", " + point.y);
 	}
 
 	void updateShopState() {
+
 		Point point = MouseInfo.getPointerInfo().getLocation();
 		p.mouseY = point.y;
 		p.mouseX = point.x;
 
-		System.out.println(point.x + ", " + point.y);
+		objectManager.addShop(new Shop(50, 150, 500, 50, "Upgrade damage", 60, 170));
+		objectManager.addShop(new Shop(50, 250, 500, 50, "Upgrade health", 60, 270));
+		objectManager.addShop(new Shop(50, 350, 500, 50, "Upgrade speed", 60, 370));
+		objectManager.addShop(new Shop(50, 450, 500, 50, "Upgrade firerate", 60, 470));
+		objectManager.update();
+
+		// System.out.println(point.x + ", " + point.y);
 	}
 
 	void updateEndState() {
@@ -78,9 +83,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, 600, 600);
 		p.draw(g);
-		for (Bullet bullet : objectManager.bullets) {
-			bullet.draw(g);
-		}
+		objectManager.draw(g);
+		g.setFont(subtitleFont);
+		g.drawString("Money: $" + objectManager.money, 485, 30);
+
 	}
 
 	void drawShopState(Graphics g) {
@@ -90,8 +96,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		g.setColor(Color.black);
 		g.drawString("UPGRADES", 190, 100);
 		g.setFont(subtitleFont);
-		g.drawRect(50, 150, 500, 50);
-		g.drawString("Upgrade damage", 60, 170);
+		for (Shop shop : objectManager.shops) {
+			shop.draw(g);
+		}
+
 	}
 
 	void drawEndState(Graphics g) {
@@ -156,10 +164,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (currentState == END_STATE) {
-				p = new Player(100, 250, 30, 30);
-				money = 0;
-				bulletSize = 2;
-				playerSize = 30;
+				p = new Player(100, 250, objectManager.playerSize, objectManager.playerSize);
+				objectManager = new ObjectManager(p);
+				// shop = new Shop(p);
 			}
 			currentState++;
 			if (currentState > END_STATE) {
@@ -195,12 +202,26 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if (currentState == GAME_STATE) {
-			objectManager.addBullet(new Bullet(p.x, p.y + 19, bulletSize, bulletSize));
+			objectManager.firing = true;
+			objectManager.shoot();
 		}
 
 		if (currentState == SHOP_STATE) {
+			// dmg
 			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 250 && p.mouseY > 200) {
-				System.out.println("1231321321321231321232132312323123231");
+
+			}
+			// vit
+			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 350 && p.mouseY > 300) {
+
+			}
+			// spd
+			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 450 && p.mouseY > 400) {
+
+			}
+			// firerate
+			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 550 && p.mouseY > 500) {
+
 			}
 		}
 	}
@@ -208,6 +229,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 	@Override
 	public void mouseReleased(MouseEvent e) {
 		// TODO Auto-generated method stub
+		objectManager.firing = false;
 	}
 
 	@Override
