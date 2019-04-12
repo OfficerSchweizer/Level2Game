@@ -23,14 +23,15 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 	int currentState = MENU_STATE;
 	Font titleFont;
 	Font subtitleFont;
+	Font shopFont;
 	Timer timer;
-	Player p = new Player(100, 250, 30, 30);
+	Player p = new Player(50, 250, 30, 30);
 	ObjectManager objectManager = new ObjectManager(p);
 
 	GamePanel() {
 		titleFont = new Font("Arial", Font.BOLD, 36);
 		subtitleFont = new Font("Arial", Font.PLAIN, 20);
-		timer = new Timer((1000 / 60), this);
+		timer = new Timer((5), this);
 
 	}
 
@@ -43,12 +44,11 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 	}
 
 	void updateGameState() {
+
 		Point point = MouseInfo.getPointerInfo().getLocation();
 		p.update(objectManager.speed, objectManager.playerSize);
 		p.mouseY = point.y - 65;
 		objectManager.update();
-
-		// System.out.println(point.x + ", " + point.y);
 	}
 
 	void updateShopState() {
@@ -58,10 +58,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		p.mouseX = point.x;
 
 		objectManager.addShop(new Shop(50, 150, 500, 50, "Upgrade damage", 60, 170));
-		objectManager.addShop(new Shop(50, 250, 500, 50, "Upgrade health", 60, 270));
+		objectManager.addShop(new Shop(50, 250, 500, 50, "Upgrade accuracy", 60, 270));
 		objectManager.addShop(new Shop(50, 350, 500, 50, "Upgrade speed", 60, 370));
 		objectManager.addShop(new Shop(50, 450, 500, 50, "Upgrade firerate", 60, 470));
 		objectManager.update();
+
+		System.out.println(objectManager.bulletOffset);
 
 		// System.out.println(point.x + ", " + point.y);
 	}
@@ -85,7 +87,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		p.draw(g);
 		objectManager.draw(g);
 		g.setFont(subtitleFont);
-		g.drawString("Money: $" + objectManager.money, 485, 30);
+		g.drawString("Money: $" + objectManager.money, 90, 30);
+
+		g.setColor(Color.black);
+		g.fillRect(0, 0, 20, 600);
 
 	}
 
@@ -96,9 +101,14 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		g.setColor(Color.black);
 		g.drawString("UPGRADES", 190, 100);
 		g.setFont(subtitleFont);
+		g.drawString("Money: $" + objectManager.money, 90, 30);
 		for (Shop shop : objectManager.shops) {
 			shop.draw(g);
 		}
+		g.drawString("Level: " + objectManager.dmgLevel, 370, 170);
+		g.drawString("Level: " + objectManager.accLevel, 370, 270);
+		g.drawString("Level: " + objectManager.spdLevel, 370, 370);
+		g.drawString("Level: " + objectManager.frtLevel, 370, 470);
 
 	}
 
@@ -185,6 +195,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 				}
 			}
 		}
+
+		if (e.getKeyCode() == KeyEvent.VK_M) {
+			objectManager.money += 1000;
+		}
 	}
 
 	@Override
@@ -203,25 +217,58 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		// TODO Auto-generated method stub
 		if (currentState == GAME_STATE) {
 			objectManager.firing = true;
-			objectManager.shoot();
+
 		}
 
 		if (currentState == SHOP_STATE) {
+
 			// dmg
 			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 250 && p.mouseY > 200) {
+				if (objectManager.dmgLevel < 10) {
+					if (objectManager.money > objectManager.dmgPrice) {
 
+						objectManager.bulletSize++;
+						objectManager.damage += 10;
+						objectManager.bulletOffset--;
+
+						objectManager.dmgLevel++;
+						objectManager.dmgPrice += 100;
+					}
+				}
 			}
-			// vit
-			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 350 && p.mouseY > 300) {
 
+			// acc
+			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 350 && p.mouseY > 300) {
+				if (objectManager.accLevel < 10) {
+					if (objectManager.money > objectManager.accPrice) {
+						objectManager.accuracy++;
+
+						objectManager.accLevel++;
+						objectManager.accPrice += 100;
+					}
+				}
 			}
 			// spd
 			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 450 && p.mouseY > 400) {
+				if (objectManager.dmgLevel < 10) {
+					if (objectManager.money > objectManager.spdPrice) {
+						objectManager.speed++;
 
+						objectManager.spdLevel++;
+						objectManager.spdPrice += 100;
+					}
+				}
 			}
 			// firerate
 			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 550 && p.mouseY > 500) {
+				if (objectManager.dmgLevel < 10) {
+					if (objectManager.money > objectManager.frtPrice) {
+						objectManager.firerate -= 20;
 
+						objectManager.frtLevel++;
+						objectManager.frtPrice += 100;
+					}
+				}
 			}
 		}
 	}

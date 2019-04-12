@@ -3,14 +3,12 @@ import java.awt.Graphics;
 
 public class Bullet extends GameObject {
 
-	int speed = 20;
-
 	Bullet(int x, int y, int width, int height) {
 		super(x, y, width, height);
 
 	}
 
-	void update() {
+	void update(int speed) {
 		// collisionBox.setBounds(x, y, width, height);
 		x += speed;
 
@@ -18,7 +16,7 @@ public class Bullet extends GameObject {
 
 	void draw(Graphics g) {
 		g.setColor(Color.BLACK);
-		g.fillRect(x, y, width, height);
+		g.drawRect(x, y, width, height);
 
 	}
 

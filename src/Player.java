@@ -29,6 +29,7 @@ public class Player extends GameObject {
 		if (y > 600 - playerSize) {
 			y = 600 - playerSize;
 		}
+		
 	}
 
 	void draw(Graphics g) {
