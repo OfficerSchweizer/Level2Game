@@ -25,7 +25,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 	Font subtitleFont;
 	Font shopFont;
 	Timer timer;
-	Player p = new Player(50, 250, 30, 30);
+	Player p = new Player(50, 250, 40, 40);
 	ObjectManager objectManager = new ObjectManager(p);
 
 	GamePanel() {
@@ -88,7 +88,6 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		objectManager.draw(g);
 		g.setFont(subtitleFont);
 		g.drawString("Money: $" + objectManager.money, 90, 30);
-
 		g.setColor(Color.black);
 		g.fillRect(0, 0, 20, 600);
 
@@ -151,6 +150,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
 		if (currentState == GAME_STATE) {
 			updateGameState();
+			objectManager.gameState = true;
+		} else {
+			updateGameState();
+			objectManager.gameState = false;
 		}
 
 		if (currentState == SHOP_STATE) {
@@ -227,7 +230,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 				if (objectManager.dmgLevel < 10) {
 					if (objectManager.money > objectManager.dmgPrice) {
 
-						objectManager.bulletSize++;
+						objectManager.bulletSize ++;
 						objectManager.damage += 10;
 						objectManager.bulletOffset--;
 
@@ -245,6 +248,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
 						objectManager.accLevel++;
 						objectManager.accPrice += 100;
+						objectManager.bulletSpeed++;
 					}
 				}
 			}
