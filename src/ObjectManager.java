@@ -9,6 +9,8 @@ public class ObjectManager {
 	ArrayList<Shop> shops = new ArrayList<Shop>();
 	Player p;
 
+	int scale = 1;
+
 	int dmgLevel = 1;
 	int accLevel = 1;
 	int spdLevel = 1;
@@ -21,23 +23,34 @@ public class ObjectManager {
 
 	int speed = 2;
 	int playerSize = 40;
-	int bulletSize = 1;
-	int bulletSpeed = 4;
-	int enemySpeed = 1;
-	int enemySize = 20;
 	int damage = 10;
 	int health = 100;
 	int accuracy = 1;
 	int money = 0;
 	int firerate = 150;
+
+	int bulletSize = 1;
+	int bulletSpeed = 4;
+
+	int enemySpeed = 1;
+	int enemySpeedOG = 1;
+	int enemySize = 20;
+	int enemySizeOG = 20;
+	int enemyHealth = 100;
+	int enemyHealthOG = 100;
+
 	int bulletOffset = 19;
 	int bulletYTime = 15;
-	int enemyHealth = 100;
+
 	boolean firing = false;
 	boolean gameState = false;
+
 	long bulletTimer = System.currentTimeMillis();
 	int enemySpawnTime = 1500;
+	int enemySpawnTimeOG = 1500;
 	long enemySpawnTimer = System.currentTimeMillis();
+	long gameScaleTimer = System.currentTimeMillis();
+	int gameScaleTime = 10000;
 
 	ObjectManager(Player p) {
 		this.p = p;
@@ -49,11 +62,67 @@ public class ObjectManager {
 
 	void addEnemy(Enemy enemy) {
 		enemies.add(enemy);
+
+		enemy.healthBar = enemy.width;
+		enemy.health = enemy.healthBar;
 	}
 
 	void addShop(Shop shop) {
 		shops.add(shop);
 
+	}
+
+	void scaleManager() {
+
+		if (gameState) {
+			if (System.currentTimeMillis() - gameScaleTimer >= gameScaleTime) {
+				scale++;
+
+				enemyHealth = enemyHealthOG * (scale / 2);
+
+				if (enemySize < 80) {
+					enemySize = enemySizeOG * (scale / 2);
+				}
+				enemySpeed = enemySpeedOG * (scale / 2);
+
+				if (enemySpawnTime > 200) {
+					enemySpawnTime = enemySpawnTimeOG - (100 * scale);
+				}
+				
+				System.out.println(enemySpawnTime);
+				
+				gameScaleTimer = System.currentTimeMillis();
+			}
+		}
+	}
+
+	void checkCollision() {
+
+		for (Bullet bullet : bullets) {
+			for (Enemy enemy : enemies) {
+				if (bullet.collisionBox.intersects(enemy.collisionBox)) {
+					enemy.health -= damage;
+
+					enemy.healthBar -= damage;
+					bullet.isAlive = false;
+				}
+			}
+		}
+	}
+
+	void isAlive() {
+		for (int i = 0; i < enemies.size(); i++) {
+			if (!enemies.get(i).isAlive) {
+				enemies.remove(enemies.get(i));
+				money += 10;
+			}
+		}
+
+		for (int i = 0; i < bullets.size(); i++) {
+			if (!bullets.get(i).isAlive) {
+				bullets.remove(bullets.get(i));
+			}
+		}
 	}
 
 	void update() {

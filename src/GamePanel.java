@@ -49,6 +49,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		p.update(objectManager.speed, objectManager.playerSize);
 		p.mouseY = point.y - 65;
 		objectManager.update();
+		objectManager.isAlive();
+		objectManager.checkCollision();
+		objectManager.scaleManager();
 	}
 
 	void updateShopState() {
@@ -57,7 +60,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		p.mouseY = point.y;
 		p.mouseX = point.x;
 
-		objectManager.addShop(new Shop(50, 150, 500, 50, "Upgrade damage", 60, 170));
+		objectManager.addShop(new Shop(50, 150, 500, 50, "Upgrade damage", 60, 170, objectManager.dmgPrice));
 		objectManager.addShop(new Shop(50, 250, 500, 50, "Upgrade accuracy", 60, 270));
 		objectManager.addShop(new Shop(50, 350, 500, 50, "Upgrade speed", 60, 370));
 		objectManager.addShop(new Shop(50, 450, 500, 50, "Upgrade firerate", 60, 470));
@@ -87,6 +90,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		p.draw(g);
 		objectManager.draw(g);
 		g.setFont(subtitleFont);
+		g.setColor(Color.black);
 		g.drawString("Money: $" + objectManager.money, 90, 30);
 		g.setColor(Color.black);
 		g.fillRect(0, 0, 20, 600);
@@ -230,11 +234,13 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 				if (objectManager.dmgLevel < 10) {
 					if (objectManager.money > objectManager.dmgPrice) {
 
-						objectManager.bulletSize ++;
-						objectManager.damage += 10;
+						objectManager.bulletSize++;
+						objectManager.damage += 5;
 						objectManager.bulletOffset--;
 
 						objectManager.dmgLevel++;
+						
+						objectManager.money -= objectManager.dmgPrice;
 						objectManager.dmgPrice += 100;
 					}
 				}
@@ -247,6 +253,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 						objectManager.accuracy++;
 
 						objectManager.accLevel++;
+						
+						objectManager.money -= objectManager.accPrice;
 						objectManager.accPrice += 100;
 						objectManager.bulletSpeed++;
 					}
@@ -254,22 +262,26 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 			}
 			// spd
 			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 450 && p.mouseY > 400) {
-				if (objectManager.dmgLevel < 10) {
+				if (objectManager.spdLevel < 10) {
 					if (objectManager.money > objectManager.spdPrice) {
 						objectManager.speed++;
 
 						objectManager.spdLevel++;
+						
+						objectManager.money -= objectManager.spdPrice;
 						objectManager.spdPrice += 100;
 					}
 				}
 			}
 			// firerate
 			if (p.mouseX > 50 && p.mouseX < 550 && p.mouseY < 550 && p.mouseY > 500) {
-				if (objectManager.dmgLevel < 10) {
+				if (objectManager.frtLevel < 10) {
 					if (objectManager.money > objectManager.frtPrice) {
 						objectManager.firerate -= 20;
 
 						objectManager.frtLevel++;
+						
+						objectManager.money -= objectManager.frtPrice;
 						objectManager.frtPrice += 100;
 					}
 				}
