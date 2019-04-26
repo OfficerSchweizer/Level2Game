@@ -29,12 +29,13 @@ public class Player extends GameObject {
 		if (y > 600 - playerSize) {
 			y = 600 - playerSize;
 		}
-		
+
 	}
 
 	void draw(Graphics g) {
 		g.setColor(Color.black);
-		g.fillRect(x, y, width, height);
+		g.fillOval(x, y, width - 5, height + 5);
+		g.fillRect(x + 20, y + 15, 30, 15);
 
 	}
 }

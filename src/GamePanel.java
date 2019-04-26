@@ -7,10 +7,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.Random;
 import java.awt.MouseInfo;
 import java.awt.Point;
-
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -26,6 +29,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 	Font shopFont;
 	Timer timer;
 	Player p = new Player(50, 250, 40, 40);
+	Base base = new Base(0, 0, 20, 600);
 	ObjectManager objectManager = new ObjectManager(p);
 
 	GamePanel() {
@@ -60,15 +64,12 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		p.mouseY = point.y;
 		p.mouseX = point.x;
 
-		objectManager.addShop(new Shop(50, 150, 500, 50, "Upgrade damage", 60, 170, objectManager.dmgPrice));
-		objectManager.addShop(new Shop(50, 250, 500, 50, "Upgrade accuracy", 60, 270));
-		objectManager.addShop(new Shop(50, 350, 500, 50, "Upgrade speed", 60, 370));
-		objectManager.addShop(new Shop(50, 450, 500, 50, "Upgrade firerate", 60, 470));
+		objectManager.addShop(new Shop(50, 150, 500, 50, "Upgrade damage", 60, 180));
+		objectManager.addShop(new Shop(50, 250, 500, 50, "Upgrade accuracy", 60, 280));
+		objectManager.addShop(new Shop(50, 350, 500, 50, "Upgrade speed", 60, 380));
+		objectManager.addShop(new Shop(50, 450, 500, 50, "Upgrade firerate", 60, 480));
+		objectManager.addShop(new Shop(180, 530, 201, 45, "Repair base", 190, 560));
 		objectManager.update();
-
-		System.out.println(objectManager.bulletOffset);
-
-		// System.out.println(point.x + ", " + point.y);
 	}
 
 	void updateEndState() {
@@ -89,11 +90,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		g.fillRect(0, 0, 600, 600);
 		p.draw(g);
 		objectManager.draw(g);
+		base.draw(g);
 		g.setFont(subtitleFont);
 		g.setColor(Color.black);
 		g.drawString("Money: $" + objectManager.money, 90, 30);
-		g.setColor(Color.black);
-		g.fillRect(0, 0, 20, 600);
 
 	}
 
@@ -105,14 +105,36 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		g.drawString("UPGRADES", 190, 100);
 		g.setFont(subtitleFont);
 		g.drawString("Money: $" + objectManager.money, 90, 30);
+
 		for (Shop shop : objectManager.shops) {
 			shop.draw(g);
 		}
-		g.drawString("Level: " + objectManager.dmgLevel, 370, 170);
-		g.drawString("Level: " + objectManager.accLevel, 370, 270);
-		g.drawString("Level: " + objectManager.spdLevel, 370, 370);
-		g.drawString("Level: " + objectManager.frtLevel, 370, 470);
 
+		g.drawString("Level: " + objectManager.dmgLevel, 370, 180);
+		g.drawString("Level: " + objectManager.accLevel, 370, 280);
+		g.drawString("Level: " + objectManager.spdLevel, 370, 380);
+		g.drawString("Level: " + objectManager.frtLevel, 370, 480);
+
+		if (objectManager.dmgLevel < 10) {
+			g.drawString("$" + objectManager.dmgPrice, 460, 180);
+		} else {
+			g.drawString("MAXED", 460, 180);
+		}
+		if (objectManager.accLevel < 10) {
+			g.drawString("$" + objectManager.accPrice, 460, 280);
+		} else {
+			g.drawString("MAXED", 460, 280);
+		}
+		if (objectManager.spdLevel < 10) {
+			g.drawString("$" + objectManager.spdPrice, 460, 380);
+		} else {
+			g.drawString("MAXED", 460, 380);
+		}
+		if (objectManager.frtLevel < 10) {
+			g.drawString("$" + objectManager.frtPrice, 460, 480);
+		} else {
+			g.drawString("MAXED", 460, 480);
+		}
 	}
 
 	void drawEndState(Graphics g) {
@@ -239,7 +261,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 						objectManager.bulletOffset--;
 
 						objectManager.dmgLevel++;
-						
+
 						objectManager.money -= objectManager.dmgPrice;
 						objectManager.dmgPrice += 100;
 					}
@@ -253,7 +275,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 						objectManager.accuracy++;
 
 						objectManager.accLevel++;
-						
+
 						objectManager.money -= objectManager.accPrice;
 						objectManager.accPrice += 100;
 						objectManager.bulletSpeed++;
@@ -267,7 +289,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 						objectManager.speed++;
 
 						objectManager.spdLevel++;
-						
+
 						objectManager.money -= objectManager.spdPrice;
 						objectManager.spdPrice += 100;
 					}
@@ -280,12 +302,19 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 						objectManager.firerate -= 20;
 
 						objectManager.frtLevel++;
-						
+
 						objectManager.money -= objectManager.frtPrice;
 						objectManager.frtPrice += 100;
 					}
 				}
 			}
+
+			// repair
+			if (p.mouseX > 180 && p.mouseX < 381 && p.mouseY < 620 && p.mouseY > 575) {
+
+			}
+
+			// 180, 530, 201, 45, "Repair base", 190, 550)
 		}
 	}
 
@@ -306,5 +335,4 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		// TODO Auto-generated method stub
 
 	}
-
 }

@@ -40,7 +40,7 @@ public class ObjectManager {
 	int enemyHealthOG = 100;
 
 	int bulletOffset = 19;
-	int bulletYTime = 15;
+	int bulletYTime = 40;
 
 	boolean firing = false;
 	boolean gameState = false;
@@ -81,16 +81,16 @@ public class ObjectManager {
 				enemyHealth = enemyHealthOG * (scale / 2);
 
 				if (enemySize < 80) {
-					enemySize = enemySizeOG * (scale / 2);
+					enemySize = enemySizeOG * (scale / 4);
 				}
-				enemySpeed = enemySpeedOG * (scale / 2);
+				enemySpeed = enemySpeedOG * (scale / 4);
 
 				if (enemySpawnTime > 200) {
 					enemySpawnTime = enemySpawnTimeOG - (100 * scale);
 				}
-				
+
 				System.out.println(enemySpawnTime);
-				
+
 				gameScaleTimer = System.currentTimeMillis();
 			}
 		}
@@ -129,7 +129,7 @@ public class ObjectManager {
 
 		if (firing) {
 			if (System.currentTimeMillis() - bulletTimer >= firerate) {
-				addBullet(new Bullet(p.x, p.y + bulletOffset, bulletSize, bulletSize));
+				addBullet(new Bullet(p.x + 15, p.y + bulletOffset, bulletSize, bulletSize));
 				bulletTimer = System.currentTimeMillis();
 			}
 		}
@@ -159,6 +159,8 @@ public class ObjectManager {
 				enemies.remove(enemies.get(i));
 			}
 		}
+		
+		
 	}
 
 	void draw(Graphics g) {
