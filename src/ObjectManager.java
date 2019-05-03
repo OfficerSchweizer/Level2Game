@@ -7,6 +7,7 @@ public class ObjectManager {
 	ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 	ArrayList<Enemy> enemies = new ArrayList<Enemy>();
 	ArrayList<Shop> shops = new ArrayList<Shop>();
+	Base base = new Base(0, 0, 20, 600);
 	Player p;
 
 	int scale = 1;
@@ -22,7 +23,7 @@ public class ObjectManager {
 	int frtPrice = 100;
 
 	int speed = 2;
-	int playerSize = 40;
+	int playerSize = 30;
 	int damage = 10;
 	int health = 100;
 	int accuracy = 1;
@@ -31,11 +32,12 @@ public class ObjectManager {
 
 	int bulletSize = 1;
 	int bulletSpeed = 4;
+	int knockback = 3;
 
 	int enemySpeed = 1;
 	int enemySpeedOG = 1;
-	int enemySize = 20;
-	int enemySizeOG = 20;
+	int enemySize = 10;
+	int enemySizeOG = 10;
 	int enemyHealth = 100;
 	int enemyHealthOG = 100;
 
@@ -78,22 +80,54 @@ public class ObjectManager {
 			if (System.currentTimeMillis() - gameScaleTimer >= gameScaleTime) {
 				scale++;
 
-				enemyHealth = enemyHealthOG * (scale / 2);
+				enemyHealth = enemyHealthOG * (scale / 4);
 
 				if (enemySize < 80) {
-					enemySize = enemySizeOG * (scale / 4);
+					enemySize = enemySizeOG * (scale / 2);
+					if (enemySize > 80) {
+						enemySize = 80;
+					}
 				}
-				enemySpeed = enemySpeedOG * (scale / 4);
 
-				if (enemySpawnTime > 200) {
+				if (gameScaleTime == 10000) {
+					if (enemySpeed < 8) {
+						enemySpeed += enemySpeedOG * (scale / 3);
+						if (enemySpeed > 9) {
+							enemySpeed = 8;
+						}
+					} else if (gameScaleTime == 15000) {
+						if (enemySpeed < 8) {
+							enemySpeed += enemySpeedOG * (scale / 3);
+							if (enemySpeed > 8) {
+								enemySpeed = 8;
+							}
+						}
+					} else if (gameScaleTime == 10000) {
+						if (enemySpeed < 6) {
+							enemySpeed += enemySpeedOG * (scale / 3);
+							if (enemySpeed > 6) {
+								enemySpeed = 6;
+							}
+						}
+					}
+				}
+
+				if (enemySpawnTime > 100) {
 					enemySpawnTime = enemySpawnTimeOG - (100 * scale);
+					if (enemySpawnTime < 100) {
+						enemySpawnTime = 100;
+					}
 				}
-
-				System.out.println(enemySpawnTime);
+				
+				// System.out.println(enemySpawnTime);
+				// System.out.println(enemyHealth);
+				// System.out.println(enemySpeed);
+				// System.out.println(enemySize);
 
 				gameScaleTimer = System.currentTimeMillis();
 			}
 		}
+
 	}
 
 	void checkCollision() {
@@ -102,10 +136,17 @@ public class ObjectManager {
 			for (Enemy enemy : enemies) {
 				if (bullet.collisionBox.intersects(enemy.collisionBox)) {
 					enemy.health -= damage;
-
+					enemy.x += knockback;
 					enemy.healthBar -= damage;
 					bullet.isAlive = false;
 				}
+			}
+		}
+
+		for (int i = 0; i < enemies.size(); i++) {
+			if (enemies.get(i).collisionBox.intersects(base.collisionBox)) {
+				base.health -= enemySpeed;
+				enemies.remove(enemies.get(i));
 			}
 		}
 	}
@@ -114,7 +155,7 @@ public class ObjectManager {
 		for (int i = 0; i < enemies.size(); i++) {
 			if (!enemies.get(i).isAlive) {
 				enemies.remove(enemies.get(i));
-				money += 10;
+				money += 25;
 			}
 		}
 
@@ -129,7 +170,7 @@ public class ObjectManager {
 
 		if (firing) {
 			if (System.currentTimeMillis() - bulletTimer >= firerate) {
-				addBullet(new Bullet(p.x + 15, p.y + bulletOffset, bulletSize, bulletSize));
+				addBullet(new Bullet(p.x + 15, p.y + bulletOffset + 5, bulletSize, bulletSize));
 				bulletTimer = System.currentTimeMillis();
 			}
 		}
@@ -139,28 +180,28 @@ public class ObjectManager {
 				addEnemy(new Enemy(601, (new Random().nextInt(550)) + 10, enemySize, enemySize));
 				enemySpawnTimer = System.currentTimeMillis();
 			}
+
+			for (int i = 0; i < bullets.size(); i++) {
+				bullets.get(i).update(bulletSpeed, bulletYTime);
+				if (bullets.get(i).y <= 0 || bullets.get(i).y >= 600 || bullets.get(i).x <= 0
+						|| bullets.get(i).x >= 600) {
+					bullets.remove(bullets.get(i));
+				}
+
+			}
+
+			for (int i = 0; i < enemies.size(); i++) {
+				enemies.get(i).update(enemySpeed);
+				if (enemies.get(i).x <= 0) {
+					enemies.remove(enemies.get(i));
+				}
+			}
 		}
 
 		for (Shop shop : shops) {
 			shop.update();
 		}
 
-		for (int i = 0; i < bullets.size(); i++) {
-			bullets.get(i).update(bulletSpeed, bulletYTime);
-			if (bullets.get(i).y <= 0 || bullets.get(i).y >= 600 || bullets.get(i).x <= 0 || bullets.get(i).x >= 600) {
-				bullets.remove(bullets.get(i));
-			}
-
-		}
-
-		for (int i = 0; i < enemies.size(); i++) {
-			enemies.get(i).update(enemySpeed);
-			if (enemies.get(i).x <= 0) {
-				enemies.remove(enemies.get(i));
-			}
-		}
-		
-		
 	}
 
 	void draw(Graphics g) {

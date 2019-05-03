@@ -34,8 +34,8 @@ public class Player extends GameObject {
 
 	void draw(Graphics g) {
 		g.setColor(Color.black);
-		g.fillOval(x, y, width - 5, height + 5);
-		g.fillRect(x + 20, y + 15, 30, 15);
+		g.fillOval(x-15, y, width - 10, height + 5);
+		g.fillRect(x + 10, y + 15, 20, 15);
 
 	}
 }
