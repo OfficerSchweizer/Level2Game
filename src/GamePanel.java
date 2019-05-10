@@ -124,6 +124,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		}
 	}
 
+	
 	void drawShopState(Graphics g) {
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, 600, 600);
