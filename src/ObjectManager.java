@@ -47,6 +47,9 @@ public class ObjectManager {
 	boolean firing = false;
 	boolean gameState = false;
 
+	long surviveTimer;
+	long surviveTimer2 = System.currentTimeMillis();
+	
 	long bulletTimer = System.currentTimeMillis();
 	int enemySpawnTime = 1500;
 	int enemySpawnTimeOG = 1500;
@@ -118,7 +121,7 @@ public class ObjectManager {
 						enemySpawnTime = 100;
 					}
 				}
-				
+
 				// System.out.println(enemySpawnTime);
 				// System.out.println(enemyHealth);
 				// System.out.println(enemySpeed);

@@ -77,7 +77,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
 		objectManager.addShop(new Shop(50, 150, 500, 50, "Upgrade damage", 60, 180));
 		objectManager.addShop(new Shop(50, 250, 500, 50, "Upgrade accuracy", 60, 280));
-		objectManager.addShop(new Shop(50, 350, 500, 50, "Upgrade speed", 60, 380));
+		objectManager.addShop(new Shop(50, 350, 500, 50, "Upgrade player speed", 60, 380));
 		objectManager.addShop(new Shop(50, 450, 500, 50, "Upgrade firerate", 60, 480));
 		objectManager.addShop(new Shop(180, 530, 201, 45, "Repair base", 190, 560));
 		objectManager.update();
@@ -110,6 +110,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		g.setColor(Color.black);
 		g.drawString("Money: $" + objectManager.money, 90, 30);
 		g.drawString("Base Health= " + objectManager.base.health, 90, 50);
+		objectManager.surviveTimer = System.currentTimeMillis();
+		g.drawString("Time: " + ((objectManager.surviveTimer - objectManager.surviveTimer2) / 1000) + "s", 480, 30);
 
 		if (objectManager.gameScaleTime == 10000) {
 			g.drawString("Difficulty: Hard", 90, 70);
@@ -170,6 +172,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 		g.setColor(Color.white);
 		g.setFont(titleFont);
 		g.drawString("GAME OVER", 175, 100);
+		g.drawString(
+				"You survived for: " + ((objectManager.surviveTimer - objectManager.surviveTimer2) / 1000) + " seconds",
+				50, 200);
 	}
 
 	public void paintComponent(Graphics g) {
@@ -230,7 +235,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			JOptionPane.showMessageDialog(null,
-					"Press ESC to open shop. Buy upgrades with money earned from shooting enemies, and defend your base. Press 1 for easy difficulty, 2 for medium, 3 for hard.");
+					"Press ESC to open shop. Move up and down by moving the mouse up and down and shoot by clicking. Buy upgrades with money earned from shooting enemies, and defend your base. Press 1 for easy difficulty, 2 for medium, 3 for hard.");
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_1) {
@@ -245,7 +250,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 
 		if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if (currentState == END_STATE) {
-				p = new Player(100, 250, objectManager.playerSize, objectManager.playerSize);
+				p = new Player(100, 250, 40, 40);
 				objectManager = new ObjectManager(p);
 				// shop = new Shop(p);
 			}
@@ -254,6 +259,9 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener, Mo
 				currentState = MENU_STATE;
 			}
 
+			if (currentState == GAME_STATE) {
+				objectManager.surviveTimer = System.currentTimeMillis();
+			}
 		}
 
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
